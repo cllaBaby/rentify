@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Гаражи</h2>
+
+    <!-- Фильтры -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Район</label>
+                    <input type="text" class="form-control" name="district" value="{{ request.args.get('district', '') }}" placeholder="Любой район">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Цена до (₽)</label>
+                    <input type="number" class="form-control" name="max_price" value="{{ request.args.get('max_price', '') }}" placeholder="Макс. цена">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Тип транспорта</label>
+                    <select class="form-select" name="vehicle_type">
+                        <option value="">Любой</option>
+                        <option value="car" {% if request.args.get('vehicle_type') == 'car' %}selected{% endif %}>Легковой</option>
+                        <option value="truck" {% if request.args.get('vehicle_type') == 'truck' %}selected{% endif %}>Грузовой</option>
+                        <option value="motorcycle" {% if request.args.get('vehicle_type') == 'motorcycle' %}selected{% endif %}>Мотоцикл</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Применить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Список гаражей -->
+    <div class="row">
+        {% for garage in garages %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='uploads/' + garage.image_url) if garage.image_url != 'default-garage.jpg' else url_for('static', filename='images/garage1.jpg') }}"
+                     class="card-img-top" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ garage.title }}</h5>
+                    <p class="card-text">
+                        <strong>{{ garage.price }} ₽/мес</strong><br>
+                        {{ garage.district }} район<br>
+                        Площадь: {{ garage.area }} м²<br>
+                        {% if garage.has_power %}<i class="fas fa-bolt text-success"></i> Есть электричество{% endif %}
+                    </p>
+                    <a href="{{ url_for('garage_detail', garage_id=garage.id) }}" class="btn btn-primary">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">Гаражи не найдены</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if pagination and pagination.pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('garages', page=pagination.prev_num, **request.args) }}">Назад</a>
+            </li>
+            {% endif %}
+
+            {% for page_num in pagination.iter_pages() %}
+            <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('garages', page=page_num, **request.args) }}">{{ page_num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('garages', page=pagination.next_num, **request.args) }}">Вперед</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

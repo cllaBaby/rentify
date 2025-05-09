@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Все уведомления</h1>
+        <form action="{{ url_for('mark_all_read') }}" method="POST" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="small btn-link">Прочитать все</button>
+        </form>
+    </div>
+
+    {% if notifications %}
+        <div class="list-group">
+            {% for notification in notifications %}
+            <div class="list-group-item {% if not notification.is_read %}unread-notification{% endif %}">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">
+                        <a href="{{ url_for('apartment_detail', apartment_id=notification.apartment_id) }}">
+                            {{ notification.apartment_title }}
+                        </a>
+                    </h5>
+                    <small>{{ time_ago(notification.created_at) }}</small>
+                </div>
+                <div class="message-content mt-2">
+                    <p><strong>От:</strong> {{ notification.sender_name }}</p>
+                    <p><strong>Телефон:</strong> {{ notification.client_phone }}</p>
+                    <div class="alert alert-light mt-2">
+                        {{ notification.client_message }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">У вас нет уведомлений</div>
+    {% endif %}
+</div>
+
+<style>
+    .unread-notification {
+        background-color: #f0f8ff;
+        border-left: 3px solid #0d6efd;
+    }
+    .message-content .alert {
+        white-space: pre-line;
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
