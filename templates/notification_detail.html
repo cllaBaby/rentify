@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="{{ url_for('all_notifications') }}" class="btn btn-outline-secondary mb-3">
+        &larr; Назад к уведомлениям
+    </a>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Уведомление по объявлению: {{notification.title }}</h4>
+        </div>
+        <div class="card-body">
+            {% if notification.client_message %}
+            <div class="message-details mb-4">
+                <h5>Сообщение от клиента:</h5>
+                <div class="alert alert-light">
+                    {{ notification.client_message }}
+                </div>
+                <p><strong>Контактный телефон:</strong> {{ notification.client_phone }}</p>
+                <p><strong>Дата:</strong> {{ notification.message_date.strftime('%d.%m.%Y %H:%M') }}</p>
+            </div>
+            {% endif %}
+
+            <div class="apartment-info">
+                <h5>Информация об объявлении:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>Адрес:</strong> {{ notification.district }}, {{ notification.address }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Цена:</strong> {{ "{:,}".format(notification.price|int) }} ₽/мес
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <strong>Комнат:</strong> {{notification.rooms }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Площадь:</strong> {{notification.area}} м²
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('apartment_detail', apartment_id=notification.id) }}"
+                   class="btn btn-primary">
+                    Перейти к объявлению
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
